@@ -86,7 +86,11 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { type, content, idempotencyKey } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { return send(res, 400, { success: false, error: 'Invalid JSON' }); }
+    }
+    const { type, content, idempotencyKey } = body || {};
     if (!validType(type)) return send(res, 400, { success: false, error: 'type must be blog, book, or course' });
 
     const validationError = validateContent(type, content);
