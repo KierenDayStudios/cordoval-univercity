@@ -1,0 +1,71 @@
+{
+  "collections": [
+    {
+      "name": "books",
+      "fields": [
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string" },
+        { "name": "author", "type": "string" },
+        { "name": "coverImage", "type": "string" },
+        { "name": "readTime", "type": "string" },
+        { "name": "chapters", "type": "array" },
+        { "name": "createdAt", "type": "number" }
+      ],
+      "rules": [
+        { "allow": "read", "condition": "true" },
+        { "allow": "write", "condition": "request.auth != null && request.auth.token.email == 'paulkieren2000@gmail.com'" }
+      ]
+    },
+    {
+      "name": "courses",
+      "fields": [
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string" },
+        { "name": "instructor", "type": "string" },
+        { "name": "coverImage", "type": "string" },
+        { "name": "duration", "type": "string" },
+        { "name": "slides", "type": "array" },
+        { "name": "quiz", "type": "array" },
+        { "name": "createdAt", "type": "number" }
+      ],
+      "rules": [
+        { "allow": "read", "condition": "true" },
+        { "allow": "write", "condition": "request.auth != null && request.auth.token.email == 'paulkieren2000@gmail.com'" }
+      ]
+    },
+    {
+      "name": "blogs",
+      "fields": [
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string" },
+        { "name": "author", "type": "string" },
+        { "name": "coverImage", "type": "string" },
+        { "name": "readTime", "type": "string" },
+        { "name": "content", "type": "string" },
+        { "name": "source", "type": "string" },
+        { "name": "createdAt", "type": "number" }
+      ],
+      "rules": [
+        { "allow": "read", "condition": "true" },
+        { "allow": "write", "condition": "request.auth != null && request.auth.token.email == 'paulkieren2000@gmail.com'" }
+      ]
+    },
+    {
+      "name": "certificates",
+      "fields": [
+        { "name": "userId", "type": "string" },
+        { "name": "courseId", "type": "string" },
+        { "name": "courseTitle", "type": "string" },
+        { "name": "userName", "type": "string" },
+        { "name": "score", "type": "number" },
+        { "name": "issuedAt", "type": "number" },
+        { "name": "signature", "type": "string" }
+      ],
+      "rules": [
+        { "allow": "read", "condition": "request.auth != null && resource.data.userId == request.auth.uid" },
+        { "allow": "create", "condition": "request.auth != null && request.resource.data.userId == request.auth.uid" },
+        { "allow": "update, delete", "condition": "false" }
+      ]
+    }
+  ]
+}

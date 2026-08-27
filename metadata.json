@@ -1,0 +1,8 @@
+{
+  "name": "Cordoval Institute real",
+  "description": "An online university for business studying. Helping people build a business online with books, presentation courses, and in-depth blogs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
