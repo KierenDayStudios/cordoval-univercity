@@ -87,7 +87,12 @@ export default async function handler(req: any, res: any) {
 
   try {
     let body = req.body;
-    if (typeof body === 'string') {
+    if (!body) {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+      const raw = Buffer.concat(chunks).toString('utf-8');
+      try { body = JSON.parse(raw); } catch { return send(res, 400, { success: false, error: 'Invalid JSON' }); }
+    } else if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { return send(res, 400, { success: false, error: 'Invalid JSON' }); }
     }
     const { type, content, idempotencyKey } = body || {};
