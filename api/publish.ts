@@ -1,13 +1,12 @@
-import { cert, getApps, initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-
 type ContentType = 'blog' | 'book' | 'course';
 
 function send(res: any, status: number, body: Record<string, unknown>) {
   res.status(status).json(body);
 }
 
-function getAdminDb() {
+async function getAdminDb() {
+  const { cert, getApps, initializeApp } = await import('firebase-admin/app');
+  const { getFirestore } = await import('firebase-admin/firestore');
   if (!getApps().length) {
     const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
     if (!raw) throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON is not configured');
@@ -93,7 +92,7 @@ export default async function handler(req: any, res: any) {
     const validationError = validateContent(type, content);
     if (validationError) return send(res, 400, { success: false, error: validationError });
 
-    const db = getAdminDb();
+    const db = await getAdminDb();
     const contentId = String(idempotencyKey || content.id || `${type}-${Date.now()}`).replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 100);
     const collection = `${type}s`;
     const payload = { ...content, id: contentId, coverImage: '', updatedAt: Date.now() };
