@@ -71,6 +71,15 @@ function validateContent(type: ContentType, value: any): string | null {
   return null;
 }
 
+function readRawBody(req: any): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+    req.on('error', reject);
+  });
+}
+
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Idempotency-Key');
@@ -86,16 +95,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    let body = req.body;
-    if (!body) {
-      const chunks: Buffer[] = [];
-      for await (const chunk of req) chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-      const raw = Buffer.concat(chunks).toString('utf-8');
-      try { body = JSON.parse(raw); } catch { return send(res, 400, { success: false, error: 'Invalid JSON' }); }
-    } else if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch { return send(res, 400, { success: false, error: 'Invalid JSON' }); }
+    let parsed: any = req.body;
+    if (!parsed || (typeof parsed === 'object' && Object.keys(parsed).length === 0)) {
+      const raw = await readRawBody(req);
+      parsed = raw ? JSON.parse(raw) : {};
     }
-    const { type, content, idempotencyKey } = body || {};
+    const { type, content, idempotencyKey } = parsed || {};
     if (!validType(type)) return send(res, 400, { success: false, error: 'type must be blog, book, or course' });
 
     const validationError = validateContent(type, content);
